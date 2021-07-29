@@ -34,7 +34,7 @@ export class TwitchBot {
             if (self) return;
 
             try {
-                if (userstate["custom-rewards-id"] === "0c212cce-5f39-4241-86b4-6c2eb4ccb01b") {
+                if (userstate["custom-reward-id"] === "0c212cce-5f39-4241-86b4-6c2eb4ccb01b") {
                     this.searchAndPlay(channel, message)
                 }
             } catch (error) {
@@ -45,7 +45,14 @@ export class TwitchBot {
                 this.handleSubcommand(channel, message)
             } else if (message === "!song") {
                 this.handleSongInfo(channel);
-            }/* else if (message.startsWith("!playsong")) {
+            } else if (message === "!skip") {
+                if (userstate.badges.moderator || userstate.badges.broadcaster) {
+                    this.handleSkip(channel)
+                } else {
+                    this.client.say(channel, "Only allowed for mods!");
+                }
+            }
+            /*else if (message.startsWith("!playsong")) {
                 this.searchAndPlay(channel, message.split("!playsong")[1])
             }*/
             else if (userstate.username === "se7kn8" && message === "Hey @se7kn8bot") {
@@ -90,8 +97,20 @@ export class TwitchBot {
         return this.state.joinedChannels.indexOf(name) !== -1
     }
 
+    private async handleSkip(channel: string) {
+        await this.spotify.skipCurrent(channel)
+        setTimeout(async () => {
+            const name = await this.spotify.getCurrentTrack(channel)
+            this.client.say(channel, "Now playing: " + name)
+        }, 1000)
+    }
+
     private async searchAndPlay(channel: string, search) {
         await this.spotify.searchAndPlay(channel, search)
+        setTimeout(async () => {
+            const name = await this.spotify.getCurrentTrack(channel)
+            this.client.say(channel, "Now playing: " + name)
+        }, 1000)
     }
 
     private async handleSongInfo(channel: string) {

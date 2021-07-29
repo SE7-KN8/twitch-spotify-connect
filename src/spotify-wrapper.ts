@@ -63,12 +63,7 @@ export class SpotifyWrapper {
             try {
                 this.handleAccess(channel)
                 const state = await this.spotify.getMyCurrentPlayingTrack()
-                const track = await this.spotify.getTrack(state.body.item.id)
-                let artists = ""
-                track.body.artists.forEach(element => {
-                    artists += element.name + " "
-                });
-                return "'" + track.body.name + "' by '" + artists + "'"
+                return this.getTrackInfo(state.body.item.id)
             } catch (error) {
                 return "No info!"
             }
@@ -82,7 +77,16 @@ export class SpotifyWrapper {
             try {
                 this.handleAccess(channel)
 
-                const track = await (await this.spotify.searchTracks(search, { limit: 1 })).body.tracks.items[0]
+                let track
+                console.log(search)
+                search = search.replace(" ", "")
+                if (search.startsWith("https://open.spotify.com/track/")) {
+                    track = await (await this.spotify.getTrack(search.replace("https://open.spotify.com/track/", "").substr(0, 22))).body
+                } else {
+                    track = await (await this.spotify.searchTracks(search, { limit: 1 })).body.tracks.items[0]
+                }
+
+
                 await this.spotify.addToQueue(track.uri)
                 await this.spotify.skipToNext()
             } catch (error) {
@@ -91,7 +95,27 @@ export class SpotifyWrapper {
         }
     }
 
-    async handleAccess(channel: string) {
+    async skipCurrent(channel: string) {
+        if (this.hasConnection(channel)) {
+            try {
+                this.handleAccess(channel)
+                await this.spotify.skipToNext()
+            } catch (error) {
+                console.log(error)
+            }
+        }
+    }
+
+    private async getTrackInfo(trackId: string): Promise<string> {
+        const track = await this.spotify.getTrack(trackId)
+        let artists = ""
+        track.body.artists.forEach(element => {
+            artists += element.name + " "
+        });
+        return "'" + track.body.name + "' by '" + artists + "'"
+    }
+
+    private async handleAccess(channel: string) {
         const currentObject = this.connectionsMap.get(channel)
         console.log("Token has: " + (currentObject.refresh_at - new Date().getTime()) / 1000 + " sec left")
         this.spotify.setAccessToken(currentObject.token)

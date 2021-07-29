@@ -16,6 +16,10 @@ import { TwitchBot } from './twitch_bot'
 
 const app = express()
 const port = process.env["PORT"]
+let prefix = ""
+if (process.env["PREFIX"]) {
+    prefix = process.env["PREFIX"]
+}
 
 const spotify = new SpotifyWrapper()
 const bot = new TwitchBot(spotify)
