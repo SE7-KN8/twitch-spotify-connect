@@ -1,0 +1,19 @@
+h1 Hello #{name}!
+p Welcome to the se7kn8bot management panel!
+if has_bot
+    p Bot: Active
+    a(href="/remove_bot")
+        p Remove bot from my channel
+else
+    p Bot: Not active
+    a(href="/add_bot")
+        p Add bot to my channel
+if has_spotify
+    p Spotify: Connected
+    a(href="/remove-spotify")
+        p Disconnect spotify
+else
+    p Spotify: Not connected
+    a(href=spotify_uri)
+        p Connect with spotify
+    
