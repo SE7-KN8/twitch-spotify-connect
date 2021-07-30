@@ -109,7 +109,7 @@ export class TwitchBot {
         await this.spotify.searchAndPlay(channel, search)
         setTimeout(async () => {
             const name = await this.spotify.getCurrentTrack(channel)
-            this.client.say(channel, "Now playing: " + name)
+            this.client.say(channel, "Coming next: " + name)
         }, 1000)
     }
 

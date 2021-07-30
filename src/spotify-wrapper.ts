@@ -61,7 +61,7 @@ export class SpotifyWrapper {
     async getCurrentTrack(channel: string): Promise<string> {
         if (this.hasConnection(channel)) {
             try {
-                this.handleAccess(channel)
+                await this.handleAccess(channel)
                 const state = await this.spotify.getMyCurrentPlayingTrack()
                 return this.getTrackInfo(state.body.item.id)
             } catch (error) {
@@ -75,7 +75,7 @@ export class SpotifyWrapper {
     async searchAndPlay(channel: string, search: string) {
         if (this.hasConnection(channel)) {
             try {
-                this.handleAccess(channel)
+                await this.handleAccess(channel)
 
                 let track
                 console.log(search)
@@ -88,7 +88,6 @@ export class SpotifyWrapper {
 
 
                 await this.spotify.addToQueue(track.uri)
-                await this.spotify.skipToNext()
             } catch (error) {
                 console.log(error)
             }
@@ -98,7 +97,7 @@ export class SpotifyWrapper {
     async skipCurrent(channel: string) {
         if (this.hasConnection(channel)) {
             try {
-                this.handleAccess(channel)
+                await this.handleAccess(channel)
                 await this.spotify.skipToNext()
             } catch (error) {
                 console.log(error)
