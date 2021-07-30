@@ -72,7 +72,7 @@ export class SpotifyWrapper {
         }
     }
 
-    async searchAndPlay(channel: string, search: string) {
+    async searchAndPlay(channel: string, search: string): Promise<string> {
         if (this.hasConnection(channel)) {
             try {
                 await this.handleAccess(channel)
@@ -86,12 +86,13 @@ export class SpotifyWrapper {
                     track = await (await this.spotify.searchTracks(search, { limit: 1 })).body.tracks.items[0]
                 }
 
-
                 await this.spotify.addToQueue(track.uri)
+                return this.getTrackInfo(track.id)
             } catch (error) {
                 console.log(error)
             }
         }
+        return "No info"
     }
 
     async skipCurrent(channel: string) {
