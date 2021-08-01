@@ -117,14 +117,15 @@ export class SpotifyWrapper {
 
     private async handleAccess(channel: string) {
         const currentObject = this.connectionsMap.get(channel)
+        this.spotify.setRefreshToken(currentObject.refresh)
         console.log("Token has: " + (currentObject.refresh_at - new Date().getTime()) / 1000 + " sec left")
         if (((currentObject.refresh_at - new Date().getTime()) / 1000) < 30) {
             const newToken = await this.spotify.refreshAccessToken()
             currentObject.token = newToken.body.access_token
             currentObject.refresh_at = ((new Date().getTime() / 1000) + newToken.body.expires_in) * 1000
         }
+        this.connectionsMap.set(channel, currentObject)
         this.spotify.setAccessToken(currentObject.token)
-        this.spotify.setRefreshToken(currentObject.refresh)
     }
 
 }
